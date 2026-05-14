@@ -1,23 +1,32 @@
 version: '3.8'
 
 services:
+
   # Backend API Service
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: truestate-backend
+
+    container_name: retail-sales-backend
+
     ports:
       - "7000:7000"
+
     environment:
-      - MONGODB_URL=${MONGODB_URL}
-      - NODE_ENV=production
-      - PORT=7000
-    depends_on:
-      - mongodb
+      NODE_ENV: production
+      PORT: 7000
+      MONGODB_URL: ${MONGODB_URL}
+
     restart: unless-stopped
+
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
     networks:
-      - truestate-network
+      - retail-network
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7000"]
       interval: 30s
@@ -25,56 +34,64 @@ services:
       retries: 3
       start_period: 40s
 
-  # Frontend Service
+
+  # Frontend React + Vite App
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: truestate-frontend
+
+    container_name: retail-sales-frontend
+
     ports:
       - "3000:80"
+
     environment:
-      - VITE_API_URL=http://backend:7000
+      VITE_API_BASE_URL: http://backend:7000/api
+
     depends_on:
       - backend
-    restart: unless-stopped
-    networks:
-      - truestate-network
 
-  # MongoDB Service (optional - use MongoDB Atlas for production)
+    restart: unless-stopped
+
+    networks:
+      - retail-network
+
+
+  # MongoDB Database
   mongodb:
-    image: mongo:7-alpine
-    container_name: truestate-mongodb
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=mongoadmin
+    image: mongo:7
+
+    container_name: retail-sales-mongodb
+
     ports:
       - "27017:27017"
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mongoadmin
+
     volumes:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
+
     restart: unless-stopped
+
     networks:
-      - truestate-network
+      - retail-network
+
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
       interval: 10s
       timeout: 5s
       retries: 5
 
+
 volumes:
   mongodb_data:
-    driver: local
   mongodb_config:
-    driver: local
+
 
 networks:
-  truestate-network:
+  retail-network:
     driver: bridge
-
-# Usage:
-# 1. Create .env file with MONGODB_URL
-# 2. Run: docker-compose up -d
-# 3. Access frontend: http://localhost:3000
-# 4. Access backend: http://localhost:7000
-# 5. Stop: docker-compose down
