@@ -1,49 +1,134 @@
 const Sale = require('../models/sale.model');
 const { buildSalesMatch } = require('../utils/queryBuilder');
 
-const buildSort = (queryParams) => {
-  const sortBy = queryParams.sortBy || 'date';
-  const sortOrder = queryParams.sortOrder === 'asc' ? 1 : -1;
-  return { [sortBy]: sortOrder };
-};
+const allowedSortFields = [
+  'date',
+  'finalAmount',
+  'quantity',
+  'customerName',
+  'customerRegion',
+  'productCategory'
+];
 
-const getSales = async (queryParams) => {
-  const page = Math.max(Number(queryParams.page) || 1, 1);
-  const limit = Math.max(Number(queryParams.limit) || 12, 1);
-  const matchStage = buildSalesMatch(queryParams);
-  const sortStage = buildSort(queryParams);
+const buildSort = (queryParams = {}) => {
+  const requestedSort = queryParams.sortBy || 'date';
 
-  const aggregation = [
-    { $match: matchStage },
-    { $sort: sortStage },
-    {
-      $facet: {
-        metadata: [{ $count: 'total' }],
-        data: [{ $skip: (page - 1) * limit }, { $limit: limit }]
-      }
-    }
-  ];
+  const sortBy = allowedSortFields.includes(requestedSort)
+    ? requestedSort
+    : 'date';
 
-  const result = await Sale.aggregate(aggregation);
-  const totalRecords = result[0]?.metadata[0]?.total || 0;
-  const totalPages = Math.max(Math.ceil(totalRecords / limit), 1);
+  const sortOrder =
+    queryParams.sortOrder === 'asc' ? 1 : -1;
 
   return {
-    data: result[0]?.data || [],
-    meta: {
-      totalRecords,
-      totalPages,
-      currentPage: page,
-      pageSize: limit
-    }
+    [sortBy]: sortOrder
   };
 };
 
-const getSalesExport = async (queryParams) => {
-  const matchStage = buildSalesMatch(queryParams);
-  const sortStage = buildSort(queryParams);
-  return Sale.find(matchStage).sort(sortStage).lean();
+const getSales = async (queryParams = {}) => {
+  try {
+    const page = Math.max(Number(queryParams.page) || 1, 1);
+
+    const limit = Math.max(Number(queryParams.limit) || 12, 1);
+
+    const skip = (page - 1) * limit;
+
+    const matchStage = buildSalesMatch(queryParams);
+
+    const sortStage = buildSort(queryParams);
+
+    const aggregation = [
+      {
+        $match: matchStage
+      },
+
+      {
+        $sort: sortStage
+      },
+
+      {
+        $facet: {
+          metadata: [
+            {
+              $count: 'total'
+            }
+          ],
+
+          data: [
+            {
+              $skip: skip
+            },
+
+            {
+              $limit: limit
+            }
+          ]
+        }
+      }
+    ];
+
+    const result = await Sale.aggregate(aggregation);
+
+    const metadata = result?.[0]?.metadata || [];
+
+    const salesData = result?.[0]?.data || [];
+
+    const totalRecords = metadata?.[0]?.total || 0;
+
+    const totalPages = Math.max(
+      Math.ceil(totalRecords / limit),
+      1
+    );
+
+    return {
+      data: Array.isArray(salesData)
+        ? salesData
+        : [],
+
+      meta: {
+        totalRecords,
+        totalPages,
+        currentPage: page,
+        pageSize: limit
+      }
+    };
+  } catch (error) {
+    console.error('GET SALES SERVICE ERROR:', error);
+
+    return {
+      data: [],
+
+      meta: {
+        totalRecords: 0,
+        totalPages: 1,
+        currentPage: 1,
+        pageSize: 12
+      }
+    };
+  }
 };
 
-module.exports = { getSales, getSalesExport };
+const getSalesExport = async (queryParams = {}) => {
+  try {
+    const matchStage = buildSalesMatch(queryParams);
 
+    const sortStage = buildSort(queryParams);
+
+    const records = await Sale.find(matchStage)
+      .sort(sortStage)
+      .lean();
+
+    return Array.isArray(records)
+      ? records
+      : [];
+  } catch (error) {
+    console.error('GET SALES EXPORT ERROR:', error);
+
+    return [];
+  }
+};
+
+module.exports = {
+  getSales,
+  getSalesExport
+};

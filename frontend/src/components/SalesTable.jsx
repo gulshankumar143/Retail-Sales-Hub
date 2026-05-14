@@ -78,19 +78,19 @@ const SalesTable = ({ records }) => {
       transition={{ duration: 0.5 }}
       className="bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl rounded-3xl border border-slate-200/60 dark:border-slate-800/60 shadow-xl overflow-hidden"
     >
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200/60 dark:divide-slate-800/60">
-          <thead className="bg-slate-50 dark:bg-slate-900">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="whitespace-nowrap px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
+      <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
+        <table className="min-w-[1400px] divide-y divide-slate-200/60 dark:divide-slate-800/60">          
+        <thead className="bg-slate-50 dark:bg-slate-900">
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <th key={header.id} className="whitespace-nowrap px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
           <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/50 bg-white dark:bg-slate-950">
             {table.getRowModel().rows.map((row, idx) => (
               <motion.tr
