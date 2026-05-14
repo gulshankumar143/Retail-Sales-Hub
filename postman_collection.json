@@ -1,0 +1,27 @@
+{
+  "info": {
+    "name": "Retail Sales Management API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Sales",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/sales?search=Ava&region=North&category=Footwear&page=1&limit=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "sales"],
+          "query": [
+            { "key": "search", "value": "Ava" },
+            { "key": "region", "value": "North" },
+            { "key": "category", "value": "Footwear" },
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "10" }
+          ]
+        }
+      }
+    }
+  ]
+}
