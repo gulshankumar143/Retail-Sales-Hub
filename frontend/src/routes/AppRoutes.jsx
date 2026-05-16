@@ -18,12 +18,12 @@ const AppRoutes = () => {
           />
         }
       />
-      <Route path="/" element={<Dashboard />} />
+      <Route path="*" element={<Dashboard />} />
       <Route path="/overview" element={<Dashboard />} />
       <Route path="/sales" element={<Sales />} />
       <Route path="/customers" element={<Customers />} />
       <Route path="/reports" element={<Reports />} />
-      <Route path="*" element={<Navigate to={`/overview`} replace />} />
+      {/* <Route path="*" element={<Navigate to={`/overview`} replace />} /> */}
     </Routes>
   );
 };
