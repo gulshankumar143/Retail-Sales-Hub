@@ -96,8 +96,7 @@ const renderChart = (item, data) => {
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={chartData} margin={{ top: 20, right: 24, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey={item.series === 'salesByRegion' ? 'region' : 'category'} tick={{ fill: '#64748b' }} />
-            <YAxis tick={{ fill: '#64748b' }} />
+            <XAxis dataKey="name" tick={{ fill: '#64748b' }} />            <YAxis tick={{ fill: '#64748b' }} />
             <Tooltip />
             <Bar dataKey={item.dataKey} fill="#8b5cf6" radius={[8, 8, 0, 0]} />
           </BarChart>

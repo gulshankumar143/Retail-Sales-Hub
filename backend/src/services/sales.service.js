@@ -67,7 +67,8 @@ const getSales = async (queryParams = {}) => {
       }
     ];
 
-    const result = await Sale.aggregate(aggregation);
+    const result = await Sale.aggregate(aggregation)
+      .allowDiskUse(true);
 
     const metadata = result?.[0]?.metadata || [];
 
