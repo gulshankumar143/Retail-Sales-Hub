@@ -13,7 +13,7 @@ const AppRoutes = () => {
         path="/"
         element={
           <Navigate
-            to={`/overview${location.search}`}
+            to={`/overview`}
             replace
           />
         }
@@ -22,7 +22,7 @@ const AppRoutes = () => {
       <Route path="/sales" element={<Sales />} />
       <Route path="/customers" element={<Customers />} />
       <Route path="/reports" element={<Reports />} />
-      <Route path="*" element={<Navigate to={`/overview${location.search}`} replace />} />
+      <Route path="*" element={<Navigate to={`/overview`} replace />} />
     </Routes>
   );
 };
