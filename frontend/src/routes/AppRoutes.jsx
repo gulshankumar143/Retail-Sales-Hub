@@ -18,6 +18,7 @@ const AppRoutes = () => {
           />
         }
       />
+      <Route path="/" element={<Dashboard />} />
       <Route path="/overview" element={<Dashboard />} />
       <Route path="/sales" element={<Sales />} />
       <Route path="/customers" element={<Customers />} />
